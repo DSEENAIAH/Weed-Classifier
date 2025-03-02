@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weed Classification</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+        color: #fff;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px 0;
+      }
+
+      .container {
+        max-width: 800px;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      h2 {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .form-control {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 1rem;
+        margin-top: 10px;
+      }
+
+      .btn {
+        border: none;
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        margin: 5px;
+      }
+
+      .btn-primary {
+        background-color: #0072ff;
+        box-shadow: 0 8px 16px rgba(0, 114, 255, 0.3);
+      }
+
+      .btn-primary:hover {
+        background-color: #005bcc;
+        box-shadow: 0 8px 24px rgba(0, 91, 204, 0.4);
+      }
+
+      .btn-danger {
+        background-color: #ff4d4d;
+        box-shadow: 0 8px 16px rgba(255, 77, 77, 0.3);
+      }
+
+      .btn-danger:hover {
+        background-color: #ff1a1a;
+        box-shadow: 0 8px 24px rgba(255, 26, 26, 0.4);
+      }
+
+      .btn-success {
+        background-color: #28a745;
+        box-shadow: 0 8px 16px rgba(40, 167, 69, 0.3);
+      }
+
+      .btn-success:hover {
+        background-color: #218838;
+        box-shadow: 0 8px 24px rgba(33, 136, 56, 0.4);
+      }
+
+      .result-container {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f1f1f1;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      .camera-container {
+        margin-top: 20px;
+        display: none;
+      }
+
+      #video {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        border-radius: 10px;
+        border: 3px solid #0072ff;
+      }
+
+      #canvas {
+        display: none;
+      }
+
+      .capture-preview {
+        margin-top: 15px;
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        border-radius: 8px;
+        border: 2px solid #28a745;
+        display: none;
+      }
+
+      .input-methods {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .method-btn {
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        background-color: #f1f1f1;
+        color: #333;
+        border-radius: 8px;
+        border: 2px solid #ddd;
+        transition: all 0.3s;
+      }
+
+      .method-btn.active {
+        background-color: #0072ff;
+        color: white;
+        border-color: #0072ff;
+      }
+
+      .result-image {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        border-radius: 8px;
+        margin-top: 15px;
+      }
+
+      .not-weed {
+        color: #28a745;
+        font-weight: 600;
+        font-size: 1.5rem;
+        margin-top: 20px;
+      }
+
+      .weed {
+        color: #dc3545;
+        font-weight: 600;
+        font-size: 1.5rem;
+        margin-top: 20px;
+      }
+
+      .alert {
+        padding: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border-radius: 10px;
+      }
+
+      .result-info p {
+        font-size: 1.1rem;
+        margin: 8px 0;
+        color: #333;
+        font-weight: 500;
+      }
+
+      .result-header {
+        font-size: 1.25rem;
+        margin-bottom: 20px;
+        font-weight: 600;
+        text-align: left;
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+      }
+      
+      .loading-spinner {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #0072ff;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>Weed Classification</h2>
+      
+      <div class="input-methods">
+        <div class="method-btn active" id="uploadBtn">Upload Image</div>
+        <div class="method-btn" id="cameraBtn">Use Camera</div>
+      </div>
+      
+      <!-- Upload Method -->
+      <div id="uploadMethod">
+        <form id="uploadForm" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="file">Upload an image of a plant:</label>
+            <input
+              type="file"
+              class="form-control"
+              id="file"
+              name="file"
+              accept="image/*"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Classify Plant
+          </button>
+        </form>
+      </div>
+      
+      <!-- Camera Method -->
+      <div id="cameraMethod" class="camera-container">
+        <div class="form-group">
+          <label>Take a photo of a plant:</label>
+          <video id="video" autoplay playsinline></video>
+          <canvas id="canvas"></canvas>
+          <img id="capturePreview" class="capture-preview" alt="Captured image" />
+        </div>
+        <div class="camera-buttons">
+          <button id="captureBtn" class="btn btn-danger">Capture Photo</button>
+          <button id="recaptureBtn" class="btn btn-primary" style="display: none;">Retake Photo</button>
+          <button id="classifyBtn" class="btn btn-success" style="display: none;">Classify Plant</button>
+        </div>
+      </div>
+      
+      <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Analyzing image...</p>
+      </div>
+
+      <div id="result" class="result-container"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Method selection
+        $("#uploadBtn").click(function() {
+          $(this).addClass("active");
+          $("#cameraBtn").removeClass("active");
+          $("#uploadMethod").show();
+          $("#cameraMethod").hide();
+          stopCamera();
+        });
+        
+        $("#cameraBtn").click(function() {
+          $(this).addClass("active");
+          $("#uploadBtn").removeClass("active");
+          $("#uploadMethod").hide();
+          $("#cameraMethod").show();
+          startCamera();
+        });
+        
+        // Camera functionality
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const capturePreview = document.getElementById('capturePreview');
+        const captureBtn = document.getElementById('captureBtn');
+        const recaptureBtn = document.getElementById('recaptureBtn');
+        const classifyBtn = document.getElementById('classifyBtn');
+        let stream = null;
+        
+        async function startCamera() {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ 
+              video: { 
+                facingMode: { ideal: "environment" } // Prefer back camera
+              } 
+            });
+            video.srcObject = stream;
+            $("#cameraMethod").show();
+          } catch (err) {
+            alert("Error accessing camera: " + err.message);
+            $("#uploadBtn").click(); // Fall back to upload method
+          }
+        }
+        
+        function stopCamera() {
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+          }
+        }
+        
+        // Capture photo
+        captureBtn.addEventListener('click', function() {
+          const context = canvas.getContext('2d');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          capturePreview.src = canvas.toDataURL('image/jpeg');
+          capturePreview.style.display = 'block';
+          
+          captureBtn.style.display = 'none';
+          recaptureBtn.style.display = 'inline-block';
+          classifyBtn.style.display = 'inline-block';
+        });
+        
+        // Retake photo
+        recaptureBtn.addEventListener('click', function() {
+          capturePreview.style.display = 'none';
+          captureBtn.style.display = 'inline-block';
+          recaptureBtn.style.display = 'none';
+          classifyBtn.style.display = 'none';
+        });
+        
+        // Classify captured photo
+        classifyBtn.addEventListener('click', function() {
+          // Convert canvas data to blob
+          canvas.toBlob(function(blob) {
+            const formData = new FormData();
+            formData.append('file', blob, 'capture.jpg');
+            
+            $("#loading").show();
+            
+            $.ajax({
+              url: "/predict",
+              type: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function(response) {
+                $("#loading").hide();
+                displayResult(response);
+              },
+              error: function(xhr, status, error) {
+                $("#loading").hide();
+                $("#result").show();
+                $("#result").html(
+                  '<div class="alert alert-danger">An error occurred: ' + error + '</div>'
+                );
+              }
+            });
+          }, 'image/jpeg', 0.95);
+        });
+
+        // Upload form submission
+        $("#uploadForm").on("submit", function (event) {
+          event.preventDefault();
+          var formData = new FormData(this);
+          
+          $("#loading").show();
+          
+          $.ajax({
+            url: "/predict",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+              $("#loading").hide();
+              displayResult(response);
+            },
+            error: function (xhr, status, error) {
+              $("#loading").hide();
+              $("#result").show();
+              $("#result").html(
+                '<div class="alert alert-danger">An error occurred: ' + error + '</div>'
+              );
+            },
+          });
+        });
+        
+        // Display result function
+        function displayResult(response) {
+          $("#result").show();
+          
+          if (response.error) {
+            $("#result").html(
+              '<div class="alert alert-danger">' + response.error + '</div>'
+            );
+          } else {
+            var resultHtml = '<div class="result-header">Weed Classification Result:</div>';
+            
+            resultHtml += '<p><strong>Plant Name:</strong> ' + response.PlantName + '</p>';
+            resultHtml += '<p><strong>Confidence:</strong> ' + response.Confidence + '</p>';
+
+            if (response.isWeed) {
+              resultHtml += '<p class="weed">This is a weed!</p>';
+              resultHtml += '<div class="result-info">';
+              
+              if (response.ControlMeasure) {
+                resultHtml += '<p><strong>Control Measure:</strong> ' + response.ControlMeasure + '</p>';
+              }
+              
+              if (response.Climate) {
+                resultHtml += '<p><strong>Climate:</strong> ' + response.Climate + '</p>';
+              }
+              
+              if (response.AdditionalInfo) {
+                resultHtml += '<p><strong>Additional Info:</strong> ' + response.AdditionalInfo + '</p>';
+              }
+              
+              if (response.MoreDetails) {
+                resultHtml += '<p><strong>More Details:</strong> ' + response.MoreDetails + '</p>';
+              }
+              
+              resultHtml += '</div>';
+            } else {
+              resultHtml += '<p class="not-weed">This is not a weed.</p>';
+              resultHtml += '<p>' + response.Message + '</p>';
+            }
+
+            resultHtml += '<img src="' + response.ImagePath + '" class="result-image" alt="Analyzed Plant Image">';
+            $("#result").html(resultHtml);
+          }
+          
+          // Scroll to result
+          $('html, body').animate({
+            scrollTop: $("#result").offset().top - 20
+          }, 500);
+        }
+      });
+    </script>
+  </body>
+</html>

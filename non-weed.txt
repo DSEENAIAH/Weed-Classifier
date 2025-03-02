@@ -1,0 +1,10 @@
+daisy
+rose
+sunflower
+tulip
+orchid
+lily
+marigold
+petunia
+daffodil
+hibiscus
